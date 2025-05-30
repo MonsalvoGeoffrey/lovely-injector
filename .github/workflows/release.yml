@@ -100,6 +100,17 @@ jobs:
         run: |
           pip3 install ziglang==0.13.0.post1 cargo-zigbuild
 
+      - name: Add Zig install_name_tool shim to PATH
+        run: |
+          ZIG_INSTALL_NAME_TOOL=$(find ~/.cache/cargo-zigbuild -name install_name_tool | head -n1)
+          if [ -z "$ZIG_INSTALL_NAME_TOOL" ]; then
+            echo "install_name_tool not found! Zig might not have set it up yet."
+            exit 1
+          fi
+          ZIG_BIN_DIR=$(dirname "$ZIG_INSTALL_NAME_TOOL")
+          echo "Adding $ZIG_BIN_DIR to PATH"
+          echo "$ZIG_BIN_DIR" >> $GITHUB_PATH
+
       - name: Build
         run: cargo zigbuild --target ${{ matrix.target }} --package lovely-unix --release
 
